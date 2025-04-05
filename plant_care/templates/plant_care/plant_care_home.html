@@ -1,0 +1,188 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}Plant Care Guide{% endblock %}
+
+{% block content %}
+<div class="col-md-10 mx-auto">
+    <div class="card mb-4">
+        <div class="card-header  text-white">
+            <h2 class="mb-0"><i class="fas fa-leaf mr-2"></i>Maintenance-Guide Generator</h2>
+        </div>
+        <div class="card-body">
+            <p class="card-text">Enter a plant name to get a detailed care guide.</p>
+            
+            <form id="plant-form" class="mb-4">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" id="plant-name" name="plant_name" class="form-control" placeholder="Enter plant name (e.g., Monstera, Aloe Vera)" required>
+                    <div class="input-group-append">
+                        <button type="submit" id="generate-btn" class="btn btn-outline-success">Generate Care Guide</button>
+                    </div>
+                </div>
+            </form>
+            
+            <div id="loader" class="text-center my-4" style="display: none;">
+                <div class="spinner-border text-success" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <p class="mt-2">Generating care guide...</p>
+            </div>
+            
+            <div id="care-guide-container" style="display: none;">
+                <h3 id="plant-title" class="mb-4 text-center"></h3>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header  text-dark d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Soil Requirements</h5>
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                            <div class="card-body" id="soil-content"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header  text-dark d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Water Requirements</h5>
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div class="card-body" id="water-content"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header  text-dark d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Light Requirements</h5>
+                                <i class="fas fa-sun"></i>
+                            </div>
+                            <div class="card-body" id="light-content"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header  text-dark d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Temperature Requirements</h5>
+                                <i class="fas fa-thermometer-half"></i>
+                            </div>
+                            <div class="card-body" id="temp-content"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header text-dark d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Nutrient Requirements</h5>
+                                <i class="fas fa-flask"></i>
+                            </div>
+                            <div class="card-body" id="nutrient-content"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header  text-dark d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">General Care Tips</h5>
+                                <i class="fas fa-hand-holding-heart"></i>
+                            </div>
+                            <div class="card-body" id="general-content"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header text-dark d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Common Issues</h5>
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="card-body" id="issues-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+$(document).ready(function() {
+    $('#plant-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const plantName = $('#plant-name').val().trim();
+        
+        if (!plantName) {
+            alert('Please enter a plant name');
+            return;
+        }
+        
+        // Show loading spinner
+        $('#loader').show();
+        $('#care-guide-container').hide();
+        
+        $.ajax({
+            url: '{% url "plant_care:generate_care_guide" %}',
+            type: 'POST',
+            data: {
+                'plant_name': plantName,
+                'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+            },
+            dataType: 'json',
+            success: function(data) {
+                // Hide loader
+                $('#loader').hide();
+                
+                // Update plant title
+                $('#plant-title').text(data.plant_name);
+                
+                // Fill in card content
+                $('#soil-content').html(formatText(data.soil_requirements));
+                $('#water-content').html(formatText(data.water_requirements));
+                $('#light-content').html(formatText(data.light_requirements));
+                $('#temp-content').html(formatText(data.temperature_requirements));
+                $('#nutrient-content').html(formatText(data.nutrient_requirements));
+                $('#general-content').html(formatText(data.general_care_tips));
+                $('#issues-content').html(formatText(data.common_issues));
+                
+                // Show care guide container
+                $('#care-guide-container').show();
+                
+                // Scroll to results
+                $('html, body').animate({
+                    scrollTop: $('#care-guide-container').offset().top - 100
+                }, 500);
+            },
+            error: function(xhr, status, error) {
+                $('#loader').hide();
+                
+                let errorMessage = 'An error occurred while generating the care guide';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMessage = xhr.responseJSON.error;
+                }
+                
+                alert(errorMessage);
+            }
+        });
+    });
+    
+    // Helper function to format text with line breaks
+    function formatText(text) {
+        if (!text) return '';
+        
+        // Replace bullet points with HTML
+        text = text.replace(/•/g, '<br>•');
+        
+        // Replace line breaks with HTML breaks
+        text = text.replace(/\n/g, '<br>');
+        
+        return text;
+    }
+});
+</script>
+{% endblock %}

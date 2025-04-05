@@ -9,11 +9,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.css" integrity="sha512-iAcZ4OrGhQ7KDqtM+LMc+iuv63aJ9O7hPyWBzCXsrZYuhJ6jhdeh40+hf9o4QmZVu8QrH/cWy/JTmoKNOL4Urw==" crossorigin="anonymous" />
     <link rel="stylesheet" href="{% static 'blog/main.css' %}">
-    <title>Word-Bucket | {% block title %}{% endblock %}</title>
+    <title>Flora Care | {% block title %}{% endblock %}</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'blog/favicon.png' %}">
 </head>
 <body>
     <header class="site-header">
-
         <!-- NAVBAR -->
         {% include 'blog/navbar.html' %}
     </header>
@@ -21,24 +22,29 @@
     <!-- MAIN SECTION -->
     <main role="main" class="container">
       <div class="row">
-
           <!-- MESSAGES -->
           <div class="col-md-8 m-auto">
             {% if messages %}
               {% for message in messages %}
                 <div class="alert {{ message.tags }}">
-                  {{message}}
+                  <i class="fas fa-leaf mr-2 plant-icon"></i> {{message}}
                 </div>
               {% endfor %}
             {% endif %}           
           </div>
-
           
           {% block content %}{% endblock %}
-          
-
       </div>
     </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-light py-4 mt-5">
+      <div class="container text-center">
+        <small class="text-muted">
+          <i class="fas fa-seedling mr-2"></i> Flora Care © {% now "Y" %} | Connecting plant lovers
+        </small>
+      </div>
+    </footer>
 
     <!-- SCRIPTS -->
       <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
@@ -95,7 +101,6 @@
           /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
           $(".js-crop-and-upload").click(function () {
             var cropData = $image.cropper("getData");
-            // console.log(cropData);
             $("#id_x").val(cropData["x"]);
             $("#id_y").val(cropData["y"]);
             $("#id_height").val(cropData["height"]);
@@ -107,13 +112,8 @@
       </script>
 
       <script type="text/javascript">
-
         $(document).ready(function(event){
-          
-          // $("#chat-box").scrollTop($("#chat-box")[0].scrollHeight);
-
           // LIKE POSTS
-
           $(document).on('click','#like',function(event){
             event.preventDefault();
             var pk = $(this).attr('value');
@@ -133,7 +133,6 @@
           });
 
           // COMMENT LIKE
-
           $(document).on('click','.clike',function(event){
             event.preventDefault();
             var pk = $(this).attr('value');
@@ -153,7 +152,6 @@
           });
 
           // SAVE POSTS
-
           $(document).on('click','#save',function(event){
             event.preventDefault();
             var pk = $(this).attr('value');
@@ -173,7 +171,6 @@
           });
 
           // COMMENT FORM
-
           $(document).on('submit','.comment-form', function(event){
             event.preventDefault();
             console.log($(this).serialize());
@@ -194,7 +191,6 @@
           });
 
           // REPLY FORM
-
           $(document).on('submit','.reply-form', function(event){
             event.preventDefault();
             console.log($(this).serialize());
@@ -213,11 +209,9 @@
               },
             });
           });
-
         });
-
-
       </script>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
       {% block script %}{% endblock %}
 

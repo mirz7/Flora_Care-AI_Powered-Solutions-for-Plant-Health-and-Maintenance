@@ -1,0 +1,364 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}{{ plant.name }} - Plant Monitoring{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header b text-white">
+                    <h5 class="card-title mb-0">{{ plant.name }} Current Readings {{ plant.location }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="reading-card temperature">
+                                <i class="fas fa-thermometer-half"></i>
+                                <h3 id="temp-value">{{ latest_data.temperature|floatformat:1 }}°C</h3>
+                                <p>Temperature</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="reading-card humidity">
+                                <i class="fas fa-tint"></i>
+                                <h3 id="hum-value">{{ latest_data.humidity|floatformat:1 }}%</h3>
+                                <p>Humidity</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="reading-card soil">
+                                <i class="fas fa-leaf"></i>
+                                <h3 id="soil-value">{{ latest_data.soil_moisture }}</h3>
+                                <p>Soil Moisture</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="card-title">Manual Watering</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group mb-3">
+                                <input type="number" id="watering-duration" class="form-control" min="1" max="30" value="5">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">seconds</span>
+                                    <button id="water-button" class="btn btn-primary" onclick="waterPlant()">Water Now</button>
+                                </div>
+                            </div>
+                            <div id="watering-status" class="alert alert-info d-none"></div>
+                            <p id="last_watering" class="text-muted">
+                                {% if latest_data.last_watering %}
+                                    Last watering: {{ latest_data.last_watering|date:"F j, Y, g:i a" }}
+                                {% else %}
+                                    No watering recorded yet
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header  text-white">
+                    <h5 class="card-title mb-0">Environmental Charts</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="chartTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="temperature-tab" data-toggle="tab" href="#temperature" role="tab">Temperature</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="soil-tab" data-toggle="tab" href="#soil" role="tab">Soil Moisture</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="humidity-tab" data-toggle="tab" href="#humidity" role="tab">Humidity</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="chartTabContent">
+                        <div class="tab-pane fade show active" id="temperature" role="tabpanel">
+                            <div class="chart-container">
+                                <canvas id="temperatureChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="soil" role="tabpanel">
+                            <div class="chart-container">
+                                <canvas id="soilChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="humidity" role="tabpanel">
+                            <div class="chart-container">
+                                <canvas id="humidityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header  text-white">
+                    <h5 class="card-title mb-0">Automatic Watering Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="automatic-watering" {% if latest_data.automatic_watering %}checked{% endif %}>
+                                <label class="custom-control-label" for="automatic-watering">Enable Automatic Watering</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="soil-threshold">Soil Moisture Threshold: <span id="threshold-value">{{ latest_data.soil_threshold }}</span></label>
+                            <input type="range" class="custom-range" id="soil-threshold" min="1000" max="4095" value="{{ latest_data.soil_threshold }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="watering-duration-setting">Watering Duration: <span id="duration-value">5</span> seconds</label>
+                            <input type="range" class="custom-range" id="watering-duration-setting" min="1" max="30" value="5">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <button id="save-settings" class="btn btn-success" onclick="saveSettings()">Save Settings</button>
+                            <div id="settings-status" class="alert alert-info d-none mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+    // Chart data from Django template
+    const timestamps = {{ timestamps|safe }};
+    const temperatures = {{ temperatures|safe }};
+    const humidities = {{ humidities|safe }};
+    const soilMoisture = {{ soil_moisture|safe }};
+    const deviceId = "{{ device.device_id }}";
+    
+    // Initialize charts
+    $(document).ready(function() {
+        // Temperature chart
+        const tempCtx = $('#temperatureChart')[0].getContext('2d');
+        const temperatureChart = new Chart(tempCtx, {
+            type: 'line',
+            data: {
+                labels: timestamps,
+                datasets: [{
+                    label: 'Temperature (°C)',
+                    data: temperatures,
+                    backgroundColor: 'rgba(255, 87, 34, 0.2)',
+                    borderColor: 'rgba(255, 87, 34, 1)',
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+        
+        // Soil moisture chart
+        const soilCtx = $('#soilChart')[0].getContext('2d');
+        const soilChart = new Chart(soilCtx, {
+            type: 'line',
+            data: {
+                labels: timestamps,
+                datasets: [{
+                    label: 'Soil Moisture',
+                    data: soilMoisture,
+                    backgroundColor: 'rgba(121, 85, 72, 0.2)',
+                    borderColor: 'rgba(121, 85, 72, 1)',
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 4095
+                    }
+                }
+            }
+        });
+        
+        // Humidity chart
+        const humCtx = $('#humidityChart')[0].getContext('2d');
+        const humidityChart = new Chart(humCtx, {
+            type: 'line',
+            data: {
+                labels: timestamps,
+                datasets: [{
+                    label: 'Humidity (%)',
+                    data: humidities,
+                    backgroundColor: 'rgba(33, 150, 243, 0.2)',
+                    borderColor: 'rgba(33, 150, 243, 1)',
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+        
+        // Set up automatic data refresh (every 30 seconds)
+        setInterval(refreshData, 30000);
+    });
+    
+    // Update threshold and duration values when sliders change
+    $('#soil-threshold').on('input', function() {
+        $('#threshold-value').text(this.value);
+    });
+    
+    $('#watering-duration-setting').on('input', function() {
+        $('#duration-value').text(this.value);
+    });
+    
+    // Function to refresh data
+    function formatLastWatering(lastWateringSeconds) {
+        if (!lastWateringSeconds) return 'No watering recorded yet';
+        
+        // Convert seconds to a readable format
+        const now = new Date();
+        const lastWateringDate = new Date(now.getTime() - (lastWateringSeconds ));
+        
+        return `Last watering: ${lastWateringDate.toLocaleString()}`;
+    }
+    
+    // Initialize charts
+    $(document).ready(function() {
+        // ... (previous chart initialization code remains the same)
+        
+        // Set up automatic data refresh (every 30 seconds)
+        setInterval(refreshData, 10000);
+    });
+    
+    // Function to refresh data
+    function refreshData() {
+        $.ajax({
+            url: `/device/${deviceId}/commands/data/`,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                // Update current readings
+                $('#temp-value').text(data.temperature.toFixed(1) + '°C');
+                $('#hum-value').text(data.humidity.toFixed(1) + '%');
+                $('#soil-value').text(data.soil_moisture);
+                
+                // Handle last watering
+                const lastWateringSeconds = data.lastWatering;
+                const lastWateringText = formatLastWatering(lastWateringSeconds);
+                
+                $('#last_watering').text(lastWateringText);
+                
+                // Optional: Add next possible watering info
+                if (data.next_possible_watering || data.nextPossibleWatering) {
+                    const nextWatering = data.next_possible_watering || data.nextPossibleWatering;
+                    const minutes = Math.floor(nextWatering / 60);
+                    const seconds = Math.floor(nextWatering % 60);
+                    $('#last_watering').append(` (Next automatic watering available in ${minutes}m ${seconds}s)`);
+                }
+            },
+            error: function(error) {
+                console.error('Error refreshing data:', error);
+                $('#last_watering').text('Unable to retrieve last watering information');
+            }
+        });
+    }
+    // Function to water plant
+    function waterPlant() {
+        const duration = $('#watering-duration').val() * 1000; // Convert to ms
+        const $statusElement = $('#watering-status');
+        $statusElement.removeClass('d-none');
+        $statusElement.text('Sending watering command...');
+        
+        $.ajax({
+            url: `/device/${deviceId}/commands/water/`,
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: JSON.stringify({ duration: duration }),
+            contentType: 'application/json',
+            success: function(data) {
+                if (data.status === 'success') {
+                    $statusElement.text('Watering command sent!');
+                    $statusElement.removeClass('alert-info').addClass('alert-success');
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+            },
+            error: function(error) {
+                $statusElement.text('Error: ' + error.message);
+                $statusElement.removeClass('alert-info').addClass('alert-danger');
+            },
+            complete: function() {
+                setTimeout(() => {
+                    $statusElement.addClass('d-none');
+                }, 5000);
+            }
+        });
+    }
+    
+    function saveSettings() {
+        const settings = {
+            automatic_watering: $('#automatic-watering').prop('checked'),
+            soil_threshold: parseInt($('#soil-threshold').val()),
+            watering_duration: parseInt($('#watering-duration-setting').val()) * 1000 // Convert to ms
+        };
+        const $statusElement = $('#settings-status');
+        $statusElement.removeClass('d-none');
+        $statusElement.text('Saving settings...');
+        
+        $.ajax({
+            url: `/device/${deviceId}/commands/settings/`,
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: JSON.stringify(settings),
+            contentType: 'application/json',
+            success: function(data) {
+                if (data.status === 'success') {
+                    $statusElement.text('Settings saved successfully!');
+                    $statusElement.removeClass('alert-info').addClass('alert-success');
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+            },
+            error: function(error) {
+                $statusElement.text('Error: ' + error.message);
+                $statusElement.removeClass('alert-info').addClass('alert-danger');
+            },
+            complete: function() {
+                setTimeout(() => {
+                    $statusElement.addClass('d-none');
+                }, 5000);
+            }
+        });
+    }
+</script>
+{% endblock %}

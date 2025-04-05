@@ -1,0 +1,126 @@
+/* Main styles */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+/* Dashboard cards */
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 8px;
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    border-radius: 8px 8px 0 0 !important;
+}
+
+/* Sensor readings */
+.reading-card {
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.reading-card i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.reading-card h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.reading-card p {
+    margin-bottom: 0;
+    color: #6c757d;
+}
+
+.temperature {
+    background-color: rgba(255, 87, 34, 0.1);
+    color: #ff5722;
+}
+
+.humidity {
+    background-color: rgba(33, 150, 243, 0.1);
+    color: #2196f3;
+}
+
+.soil {
+    background-color: rgba(121, 85, 72, 0.1);
+    color: #795548;
+}
+
+/* Charts */
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin-top: 20px;
+}
+
+.nav-tabs .nav-link {
+    color: #198754;
+}
+
+.nav-tabs .nav-link.active {
+    color: #198754;
+    font-weight: bold;
+}
+
+/* Form elements */
+.form-range::-webkit-slider-thumb {
+    background: #198754;
+}
+
+.form-range::-moz-range-thumb {
+    background: #198754;
+}
+
+.form-range::-ms-thumb {
+    background: #198754;
+}
+
+.form-check-input:checked {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+/* Button styles */
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.btn-success:hover {
+    background-color: #146c43;
+    border-color: #146c43;
+}
+
+/* Status indicators */
+.alert {
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .reading-card {
+        margin-bottom: 15px;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+}

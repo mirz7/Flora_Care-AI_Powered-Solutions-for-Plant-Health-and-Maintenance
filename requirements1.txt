@@ -1,0 +1,14 @@
+gunicorn==20.1.0  # For production WSGI server
+numpy==1.23.5  # For numerical computing
+# pandas==1.2.4  # For data processing
+# Pillow==8.2.0  # For image processing
+python-dateutil==2.8.1  # For date utilities
+pytz==2021.1  # For timezone support
+six==1.15.0  # Required by some libraries
+# torch==1.8.1+cpu  # PyTorch for machine learning
+# torchvision==0.9.1+cpu  # PyTorch Vision for image processing
+# typing-extensions==3.7.4.3  # Type hinting support
+
+# Django-Specific Additions
+djangorestframework==3.14.0  # If you're using Django REST API
+django-cors-headers==3.13.0  # If you need CORS support

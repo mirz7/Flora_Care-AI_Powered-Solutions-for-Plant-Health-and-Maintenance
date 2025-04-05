@@ -26,7 +26,7 @@ def first(request):
     return render(request, 'blog/first.html', context)
 
 """ Posts of following user profiles """
-@login_required
+@login_required 
 def posts_of_following_profiles(request):
 
     profile = Profile.objects.get(user = request.user)
@@ -251,7 +251,7 @@ def PostDetailView(request,pk):
 """ Create post """
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields =['title', 'content']
+    fields =['title', 'content','image']
 
     def form_valid(self, form):
         form.instance.author = self.request.user

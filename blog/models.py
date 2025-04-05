@@ -9,6 +9,7 @@ class Post(models.Model):
     title = models.CharField(max_length=150)
     content = RichTextField(blank=True, null=True)
     date_posted = models.DateTimeField(default=timezone.now)
+    image = models.ImageField(upload_to='post_images/', blank=True, null=True)
     date_updated = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     likes = models.ManyToManyField(User, related_name="blogpost", blank=True)

@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import AllSaveView, PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView, SaveView, UserPostListView, LikeView,LikeCommentView, posts_of_following_profiles,  AllLikeView
+from django.urls import path, include 
 
 urlpatterns = [
     path('', views.first, name='firsthome'),
@@ -18,4 +19,7 @@ urlpatterns = [
     path('post/comment/like/', LikeCommentView, name='comment-like'),
     path('about/', views.about, name='blog-about'),
     path('search/', views.search, name='search'),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+    
 ]
+

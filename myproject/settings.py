@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from django.contrib.messages import constants as messages
+from django.urls import path, include
 
 # Loading ENV
 env_path = Path('.') / '.env'
@@ -27,13 +28,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback_secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG")
+DEBUG = os.getenv("DEBUG", "True") == "True" 
 
-ALLOWED_HOSTS = ['*'] 
 
+ALLOWED_HOSTS = ['192.168.1.3', 'localhost', '127.0.0.1','0.0.0.0']
 
 # Application definition
 
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
 
     'ckeditor',
+    'ckeditor_uploader',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -62,25 +64,34 @@ INSTALLED_APPS = [
     'chat',
     'channels',
     'friend',
-    'videocall',
+    'plant_disease_app',
+     'plant_care',
+     'plant_app',
+    'drf_spectacular',
+    'rest_framework',
+
+    
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'myproject.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'users/templates')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'users/templates'),
+            BASE_DIR / 'plant_disease_app' / 'templates' / 'plant_disease_app',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -92,6 +103,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -109,6 +121,16 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
+
+# CKEditor configuration
+CKEDITOR_JQUERY_URL = 'path/to/jquery.js'
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+CKEDITOR_CONFIGS = {
+    'default': {
+         'toolbar': 'basic',
+        # Your CKEditor config here
+    },
 }
 
 # DATABASES = {
@@ -160,6 +182,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),
+                     os.path.join(BASE_DIR, 'plant_disease_app', 'static'),]  
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -175,10 +205,13 @@ CKEDITOR_CONFIGS = {
     },
 }
 
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp-relay.brevo.com'  # Brevo SMTP server
 EMAIL_PORT = os.getenv("EMAIL_PORT")
 EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False 
 EMAIL_HOST_USER = os.getenv('EMAIL_USER')     # environment variable containing username
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASS')  # environment variable containing password
 
@@ -202,6 +235,8 @@ CHANNEL_LAYERS = {
 
 SITE_ID = 2     # considering 2nd site in 'Sites' to be 127.0.0.1 (for dev)
 
+
+
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
@@ -220,3 +255,5 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
     }
 }
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_UPLOAD_PATH = "media/uploads/"

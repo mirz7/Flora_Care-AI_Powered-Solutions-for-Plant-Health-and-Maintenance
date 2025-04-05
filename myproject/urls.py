@@ -19,6 +19,8 @@ from django.urls import path, include
 from users import views as user_views
 from django.conf import settings
 from django.conf.urls.static import static
+from plant_disease_app.views import ai_engine 
+from django.conf import settings
 
 
 
@@ -40,10 +42,26 @@ urlpatterns = [
     path('user/', include('users.urls')),
     path('notifications/', include('notification.urls')),
     path('chats/', include('chat.urls')),
-    path('vc/', include('videocall.urls')),
     path('friend/', include('friend.urls', namespace='friend')),
-]
+    path('plant_disease/', include('plant_disease_app.urls', namespace='plant_disease_app')),
+    path('plant-care/', include('plant_care.urls', namespace='plant_care')),
+#     path('plant-disease/', include('plant_disease_app.urls', namespace='plant_disease_app')),
+#     path('room-enroll/', room_enroll_view, name='room-enroll'),
+# ]
+    # path('plant-monitoring', views.dashboard, name='dashboard'),
+    
+    # # Device detail route
+    # path('device/<str:device_id>/', views.device_detail, name='device_detail'),
+      path('', include('plant_app.urls', namespace='receive_plant_data')),
+      path('dashboard/', include('plant_app.dashboard_urls' )),
+      
 
+]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
+    # path('', views.dashboard, name='dashboard'),
+    
+    # # Device detail route
+    # path('device/<str:device_id>/', views.device_detail, name='device_detail'),

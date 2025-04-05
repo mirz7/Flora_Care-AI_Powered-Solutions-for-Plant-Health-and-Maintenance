@@ -53,27 +53,30 @@ def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-
-            # reCAPTCHA V2
+            # Get reCAPTCHA response
             recaptcha_response = request.POST.get('g-recaptcha-response')
+
+            # Directly use the secret key (NOT SECURE)
+            SECRET_KEY = "6LdQb-8qAAAAAI7P7JbVDfnkuOyYQ4eQSuoGnmH4"
+
             data = {
-                'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                'secret': SECRET_KEY,
                 'response': recaptcha_response
             }
             r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
             result = r.json()
 
-            if result['success']:
+            if result.get('success'):
                 form.save()
-                username = form.cleaned_data.get('username')
-                messages.success(request, f"Your account has been created! You can login now")
+                messages.success(request, "Your account has been created! You can login now")
                 return redirect('login')
             else:
-                messages.error(request, 'Invalid reCAPTCHA. Please try again.')            
+                messages.error(request, f"Invalid reCAPTCHA. Reason: {result.get('error-codes')}")
             
     else:
         form = UserRegisterForm()
-    return render(request, 'users/register.html', {'form':form})
+
+    return render(request, 'users/register.html', {'form': form})
 
 
 """ User profile """

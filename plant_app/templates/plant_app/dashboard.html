@@ -1,0 +1,56 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}Plant Monitoring Dashboard{% endblock %}
+
+{% block content %}
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-header  text-white">
+            <h2 class="card-title mb-0"></i>Your Plants Connected!</h2>
+        </div>
+        <div class="card-body">
+            {% if devices %}
+                <div class="row">
+                    {% for device in devices %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ device.plant.name }}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">{{ device.plant.location }}</h6>
+                                    <p class="card-text">Device ID: {{ device.device_id }}</p>
+                                    
+                                    {% for data in device.sensor_data.all|slice:":1" %}
+                                        <div class="sensor-readings">
+                                            <p><i class="fas fa-thermometer-half mr-2"></i> Temperature: {{ data.temperature }}°C</p>
+                                            <p><i class="fas fa-tint mr-2"></i> Humidity: {{ data.humidity }}%</p>
+                                            <p><i class="fas fa-leaf mr-2"></i> Soil Moisture: {{ data.soil_moisture }}</p>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-muted">No data available yet</p>
+                                    {% endfor %}
+                                    
+                                    <a href="{% url 'device_detail' device.device_id %}" class="btn btn-steel mt-3">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle mr-2"></i> No devices connected yet. Connect your ESP32 device to get started.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    // Remove the problematic URL reference
+    $(document).ready(function() {
+        // Any dashboard-specific JavaScript can go here
+    });
+</script>
+{% endblock %}

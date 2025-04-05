@@ -23,12 +23,12 @@
         <p class="card-text text-center text-muted">{{object.user.email}}</p>
         <p class="card-text text-center text-muted">{{object.user.profile.bio}}</p>
 
-		<ul class="social-links list-inline text-center m-4">
+		<!-- <ul class="social-links list-inline text-center m-4">
 			<li class="list-inline-item m-1"><a title="" data-placement="top" data-toggle="tooltip" class="tooltips btn-primary" href="" data-original-title="Facebook"><i class="fab fa-facebook-f"></i></a></li>
 			<li class="list-inline-item m-1"><a title="" data-placement="top" data-toggle="tooltip" class="tooltips btn-info" href="" data-original-title="Twitter"><i class="fab fa-twitter"></i></a></li>
 			<li class="list-inline-item m-1"><a title="" data-placement="top" data-toggle="tooltip" class="tooltips btn-danger" href="" data-original-title="Skype"><i class="fab fa-instagram"></i></a></li>
 			<li class="list-inline-item m-1"><a title="" data-placement="top" data-toggle="tooltip" class="tooltips btn-primary" href="" data-original-title="Linkedin"><i class="fab fa-linkedin"></i></a></li>
-		</ul>
+		</ul> -->
 
         <div class="text-center">
             {% if object.user != user %}
@@ -188,11 +188,11 @@
 
 <div>
 
-	{% if is_friend %}
+	<!-- {% if is_friend %}
 		<a class="align-items-center btn btn-primary d-flex flex-column" href="{% url 'room-choice' object.user.id %}">
 			<i class="fas fa-comments"></i>&nbsp;&nbsp;Message
 		</a>
-	{% endif %}
+	{% endif %} -->
 
 </div>
 

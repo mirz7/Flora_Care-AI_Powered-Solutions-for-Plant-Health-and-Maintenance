@@ -27,8 +27,17 @@
         </div>
     {% endif %} 
     
-
     <hr>
+    
+    <!-- Image Section -->
+    {% if post.image %}
+        <img src="{{ post.image.url}}" alt="Post Image" style="max-width: 100%; height: auto;">
+    {% else %}
+        <p>No image available</p>
+    {% endif %}
+    
+    <hr>
+    
     <p class="article-content">{{ post.content|safe }}</p>
 </article>
 
@@ -36,17 +45,14 @@
     {% include 'blog/like_section.html' %}
 </div>
 
-
 <hr>
 
 <div class="main-comment-section">
     {% include 'blog/comments.html' %}
 </div>
 
-
 <br><br>
 
 </div>
-
 
 {% endblock %}
