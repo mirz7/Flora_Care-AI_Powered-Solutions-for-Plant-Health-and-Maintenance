@@ -47,6 +47,7 @@ Mobile-responsive interface
 ## Demo
 
 <a href="./demo/Flora_care.mp4">Video Link</a>
+https://github.com/user-attachments/assets/e8b83002-8655-41de-a717-533f27c36f86
 
 <a href="./demo/iot.jpg">IoT Setup</a>
 ![Image](https://github.com/user-attachments/assets/4a1dc380-641d-421c-a34b-b54135ff8016)
