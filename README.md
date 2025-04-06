@@ -49,7 +49,7 @@ Mobile-responsive interface
 <a href="./demo/Flora_care.mp4">Video Link</a>
 
 <a href="./demo/iot.jpg">IoT Setup</a>
-
+![Image](https://github.com/user-attachments/assets/4a1dc380-641d-421c-a34b-b54135ff8016)
 ## Adding Environment Variables
 
 - Rename the provided `.test.env` file to `.env`
