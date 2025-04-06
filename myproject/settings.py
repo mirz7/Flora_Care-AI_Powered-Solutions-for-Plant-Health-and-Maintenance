@@ -34,7 +34,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback_secret_key')
 DEBUG = os.getenv("DEBUG", "True") == "True" 
 
 
-ALLOWED_HOSTS = ['192.168.1.3', 'localhost', '127.0.0.1','0.0.0.0']
+ALLOWED_HOSTS = ['', 'localhost', '127.0.0.1','0.0.0.0']
 
 # Application definition
 
@@ -60,10 +60,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     'blog.apps.BlogConfig',
     'users.apps.UsersConfig',
-    'notification',
-    'chat',
     'channels',
-    'friend',
     'plant_disease_app',
      'plant_care',
      'plant_app',
