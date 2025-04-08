@@ -10,7 +10,7 @@ FloraCare is an all-in-one smart plant care solution that combines Machine Learn
 CNN model built with PyTorch
 Supports 38 different plant classes
 Provides instant plant health diagnostics
-Trained on thousands of diverse plant images
+Trained on thousands of diverse plant leaf images
 Identifies both common and rare plant diseases
 Integrated directly with Django backend
 
