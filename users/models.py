@@ -13,6 +13,7 @@ class Profile(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics',blank=True, null=True)
+    
 
 
     def profile_posts(self):
