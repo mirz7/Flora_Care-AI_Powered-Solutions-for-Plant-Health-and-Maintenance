@@ -15,6 +15,7 @@ class Post(models.Model):
     likes = models.ManyToManyField(User, related_name="blogpost", blank=True)
     saves = models.ManyToManyField(User, related_name="blogsave", blank=True)
 
+    
     def total_likes(self):
         return self.likes.count()
 
